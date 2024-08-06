@@ -1,14 +1,14 @@
 namespace Calculator.Tokenizer.Tokens;
 public class Token
 {
-    public Token? Next { get; set; }
+    public virtual Token? NextToken { get; set; }
     public Token()
     {
-        Next = null;
+        NextToken = null;
     }
 
     public Token(Token? next)
     {
-        Next = next;
+        NextToken = next;
     }
 }
