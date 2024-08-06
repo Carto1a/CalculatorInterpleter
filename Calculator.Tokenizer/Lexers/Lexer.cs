@@ -15,12 +15,12 @@ public class Lexer
         _reader = new StreamReader(input);
     }
 
-    private bool IsNumber(char c)
+    private bool IsNumber(char character)
     {
-        var number0 = 48;
-        var number9 = 57;
+        int asciinumber0 = 48;
+        int asciinumber9 = 57;
 
-        return c >= number0 && c <= number9;
+        return character >= asciinumber0 && character <= asciinumber9;
     }
 
     public string Untokenize(Token root)
@@ -37,8 +37,7 @@ public class Lexer
         return buffer.ToString();
     }
 
-    public string UntokenizeRecursive(
-        Token? root, StringBuilder? buffer = null)
+    public string UntokenizeRecursive(Token? root, StringBuilder? buffer = null)
     {
         buffer ??= new StringBuilder();
         if (root == null)
@@ -49,43 +48,43 @@ public class Lexer
         return UntokenizeRecursive(root.NextToken, buffer.Append(root.ToString()));
     }
 
-    // 1 + 2 + 3: good
-    // -1 + 2 + 3: good
-    // -1 + -2 + 3: good
+    // 1 + 2 + 3: good work
+    // -1 + 2 + 3: good work
+    // -1 + +2 + 3: good work
     //
-    // -1 + (-2) + 3: good
-    // -1 ( 2 + 2 ) + 3: good
-    // - ( 1 + 2 ) + 3: good
-    private Token? Tokenizer(int input, Token? previus = null)
+    // -1 + (-2) + 3: good no
+    // -1 ( 2 + 2 ) + 3: good no
+    // - ( 1 + 2 ) + 3: good no
+    private Token? Tokenizer(int input, Token? previusToken = null)
     {
         while (input != -1)
         {
-            char current = (char)input;
-            if(current == ' ')
+            char currentChar = (char)input;
+            if(currentChar == ' ')
             {
                 input = NextCharacter();
                 continue;
             }
-            else if (IsNumber(current))
+            else if (IsNumber(currentChar))
             {
-                var buffer = new StringBuilder();
-                buffer.Append(current);
-                char nextchar = (char)NextCharacter();
+                var stringBuilder = new StringBuilder();
+                stringBuilder.Append(currentChar);
+                char nextChar = (char)NextCharacter();
 
-                while(IsNumber(nextchar))
+                while(IsNumber(nextChar))
                 {
-                    buffer.Append(nextchar);
+                    stringBuilder.Append(nextChar);
                 }
 
-                var stringNumber = buffer.ToString();
+                var stringNumber = stringBuilder.ToString();
                 var token = new TokenNumber(decimal.Parse(stringNumber));
-                SetNextToken(previus, token);
+                SetNextToken(previusToken, token);
 
                 return Tokenizer(NextCharacter(), token);
             }
-            else if (current == '+')
+            else if (currentChar == '+')
             {
-                if (previus is TokenOperator || previus is null)
+                if (previusToken is TokenOperator || previusToken is null)
                 {
                     var tokenSignal = new SignalPositive();
                     var nextTokenSignal = Tokenizer(NextCharacter(), tokenSignal);
@@ -94,14 +93,14 @@ public class Lexer
                         throw new Exception("Invalid token");
                     }
 
-                    SetNextToken(previus, tokenSignal);
+                    SetNextToken(previusToken, tokenSignal);
 
                     return tokenSignal;
                 }
 
-                var tokenOperator = new OperatorAdd(previus);
+                var tokenOperator = new OperatorAdd(previusToken);
                 var nextTokenOperator = Tokenizer(NextCharacter(), tokenOperator);
-                SetNextToken(previus, tokenOperator);
+                SetNextToken(previusToken, tokenOperator);
 
                 if (nextTokenOperator is TokenOperator)
                 {
@@ -116,7 +115,7 @@ public class Lexer
             }
         }
 
-        return previus;
+        return previusToken;
     }
 
     private int NextCharacter()
@@ -133,12 +132,6 @@ public class Lexer
         }
 
         previus.NextToken = next;
-    }
-
-    private Token ToToken(string input, int start, int end)
-    {
-        throw new NotImplementedException();
-        /* return T(input[start..end]); */
     }
 
     public Token Tokenization()
