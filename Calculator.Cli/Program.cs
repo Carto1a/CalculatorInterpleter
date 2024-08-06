@@ -6,7 +6,7 @@ using Calculator.Tokenizer.Tokens.Mathematic.Operators;
 
 Console.WriteLine("Hello, World!");
 
-var input = "+2";
+var input = "-1+2";
 Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(input));
 var lexer = new Lexer(stream);
 

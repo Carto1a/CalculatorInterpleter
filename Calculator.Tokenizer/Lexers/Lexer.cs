@@ -89,7 +89,9 @@ public class Lexer
 
                 _tokenList.Add(token);
 
-                return Tokenizer(nextChar, token);
+                var nextToken = Tokenizer(nextChar, token);
+
+                return token;
             }
             else if (currentChar == '+')
             {
@@ -110,7 +112,6 @@ public class Lexer
                         throw new Exception("Invalid token");
                     }
 
-
                     return token;
                 }
 
@@ -129,7 +130,7 @@ public class Lexer
                     throw new Exception("Invalid token");
                 }
 
-                return nextTokenOperator;
+                return token;
             }
             else if (currentChar == '-')
             {
@@ -167,7 +168,7 @@ public class Lexer
                     throw new Exception("Invalid token");
                 }
 
-                return nextTokenOperator;
+                return token;
             }
             else
             {
