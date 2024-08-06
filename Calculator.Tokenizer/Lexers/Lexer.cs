@@ -8,6 +8,7 @@ namespace Calculator.Tokenizer.Lexers;
 public class Lexer
 {
     private readonly StreamReader _reader;
+    private int _whiteSpaceCounter = 0;
     private Token? _root;
 
     public Lexer(Stream input)
@@ -62,11 +63,16 @@ public class Lexer
             char currentChar = (char)input;
             if(currentChar == ' ')
             {
+                _whiteSpaceCounter++;
+                if (_whiteSpaceCounter > 2)
+                    throw new Exception("too many white spaces");
+
                 input = NextCharacter();
                 continue;
             }
             else if (IsNumber(currentChar))
             {
+                _whiteSpaceCounter = 0;
                 var stringBuilder = new StringBuilder();
                 stringBuilder.Append(currentChar);
                 char nextChar = (char)NextCharacter();
@@ -84,6 +90,7 @@ public class Lexer
             }
             else if (currentChar == '+')
             {
+                _whiteSpaceCounter = 0;
                 if (previusToken is TokenOperator || previusToken is null)
                 {
                     var tokenSignal = new SignalPositive();
@@ -142,6 +149,6 @@ public class Lexer
         var root = Tokenizer(character);
         if (root == null) throw new Exception("Error or no data");
 
-        return root;
+        return _root;
     }
 }
