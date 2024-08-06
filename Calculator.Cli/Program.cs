@@ -4,9 +4,12 @@ using Calculator.Tokenizer.Lexers;
 using Calculator.Tokenizer.Tokens.Mathematic;
 using Calculator.Tokenizer.Tokens.Mathematic.Operators;
 
+// TODO: stop using recursion
+// TODO: implement scopes
+
 Console.WriteLine("Hello, World!");
 
-var input = "-1+2";
+var input = "1 + 2";
 Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(input));
 var lexer = new Lexer(stream);
 

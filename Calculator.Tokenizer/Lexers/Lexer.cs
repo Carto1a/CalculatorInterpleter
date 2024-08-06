@@ -2,18 +2,23 @@ using System.Text;
 using Calculator.Tokenizer.Tokens;
 using Calculator.Tokenizer.Tokens.Mathematic;
 using Calculator.Tokenizer.Tokens.Mathematic.Operators;
+using Calculator.Tokenizer.Tokens.Mathematic.Scopes;
 using Calculator.Tokenizer.Tokens.Mathematic.Signals;
 
 namespace Calculator.Tokenizer.Lexers;
 public class Lexer
 {
+    public readonly int MIN_SCOPE_LEVEL = 0;
+
     private readonly TokenList _tokenList = new();
     private readonly StreamReader _reader;
     private int _whiteSpaceCounter = 0;
+    private int _atualScopeLevel;
 
     public Lexer(Stream input)
     {
         _reader = new StreamReader(input);
+        _atualScopeLevel = MIN_SCOPE_LEVEL;
     }
 
     private bool IsNumber(char character)
@@ -170,6 +175,45 @@ public class Lexer
 
                 return token;
             }
+            /* else if (currentChar == '(') */
+            /* { */
+            /*     _whiteSpaceCounter = 0; */
+            /*     token = new TokenOpenScope(MIN_SCOPE_LEVEL); */
+            /*     _tokenList.Add(token); */
+
+            /*     var openScopeToken = token as TokenOpenScope; */
+            /*     while (true) */
+            /*     { */
+            /*         _whiteSpaceCounter = 0; */
+
+            /*         var nextToken = Tokenizer(NextCharacter(), token); */
+            /*         if (nextToken is null) */
+            /*         { */
+            /*             throw new Exception("Invalid token"); */
+            /*         } */
+
+            /*         openScopeToken!.Add(nextToken); */
+            /*         _tokenList.Add(nextToken); */
+
+            /*         if (nextToken is TokenCloseScope) */
+            /*         { */
+            /*             break; */
+            /*         } */
+            /*     } */
+
+            /*     return token; */
+            /* } */
+            /* else if (currentChar == ')') */
+            /* { */
+            /*     _whiteSpaceCounter = 0; */
+            /*     token = new TokenCloseScope(); */
+            /*     _tokenList.Add(token); */
+
+            /*     var nextToken = Tokenizer(NextCharacter(), token); */
+
+            /*     return token; */
+
+            /* } */
             else
             {
                 throw new Exception("Invalid token");
