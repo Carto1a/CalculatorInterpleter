@@ -137,8 +137,11 @@ public class Lexer
     public Token Tokenization()
     {
         var character = _reader.Read();
-        if (character == -1) throw new Exception("No more characters to read");
+        if (character == -1) throw new Exception("No character to tokenize");
 
-        return Tokenizer(character);
+        var root = Tokenizer(character);
+        if (root == null) throw new Exception("Error or no data");
+
+        return root;
     }
 }
