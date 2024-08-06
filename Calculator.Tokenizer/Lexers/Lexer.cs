@@ -1,18 +1,49 @@
 using System.Text;
 using Calculator.Tokenizer.Tokens;
-
+using Calculator.Tokenizer.Tokens.Mathematic;
 
 namespace Calculator.Tokenizer.Lexers;
 public class Lexer
 {
-    public NonTerminalToken Tokenize(string input)
+    private bool IsNumber(char c)
     {
-        var numberbuffer = new StringBuilder();
-
         var number0 = 48;
         var number9 = 57;
 
+        return c >= number0 && c <= number9;
+    }
+
+    public string Untokenize(Token root)
+    {
+        var buffer = new StringBuilder();
+        var current = root;
+
+        while (current != null)
+        {
+            buffer.Append(current.ToString());
+            current = current.Next;
+        }
+
+        return buffer.ToString();
+    }
+
+    public string UntokenizeRecursive(
+        Token? root, StringBuilder? buffer = null)
+    {
+        buffer ??= new StringBuilder();
+        if (root == null)
+        {
+            return buffer.ToString();
+        }
+
+        return UntokenizeRecursive(root.Next, buffer.Append(root.ToString()));
+    }
+
+    public Token Tokenize(string input)
+    {
+        var root = new Token();
         var position = 0;
+
 
         while (input.Length >= position)
         {
@@ -21,31 +52,35 @@ public class Lexer
                 position++;
                 continue;
             }
-
-            else if (input[position] >= number0 && input[position] <= number9)
+            else if (IsNumber(input[position]))
             {
-                numberbuffer.Append(input[position]);
-                position++;
+                var numberbuffer = new StringBuilder();
+
+                while (IsNumber(input[position]))
+                {
+                    numberbuffer.Append(input[position]);
+                    position++;
+                }
+
+                var number = decimal.Parse(numberbuffer.ToString());
+                root.Next = new TokenNumber(number);
                 continue;
+            }
+            else if (input[position] == '+')
+            {
+                var left = Tokenize(input.Substring(0, position));
+                var right = Tokenize(input.Substring(position + 1));
             }
             else
             {
-                break;
+                throw new Exception("Invalid token");
             }
-
-            /* if (inputnospace[position] == '+') */
-            /* { */
-            /*     var left = Tokenize(inputnospace.Substring(0, position)); */
-            /*     var right = Tokenize(inputnospace.Substring(position + 1)); */
-            /*     return new TokenTree(new OperatorAdd(left.Root, right.Root)); */
-            /* } */
         }
 
-
-        return new NonTerminalToken(new List<Token> { new Token() });
+        return root;
     }
 
-    public NonTerminalToken Tokenize(string input, int start, int end)
+    public Token Tokenize(string input, int start, int end)
     {
         return Tokenize(input[start..end]);
     }
