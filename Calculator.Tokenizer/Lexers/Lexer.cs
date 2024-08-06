@@ -75,9 +75,9 @@ public class Lexer
                 _whiteSpaceCounter = 0;
                 var stringBuilder = new StringBuilder();
                 stringBuilder.Append(currentChar);
-                char nextChar = (char)NextCharacter();
+                var nextChar = NextCharacter();
 
-                while(IsNumber(nextChar))
+                while(IsNumber((char)nextChar))
                 {
                     stringBuilder.Append(nextChar);
                 }
@@ -86,7 +86,7 @@ public class Lexer
                 var token = new TokenNumber(decimal.Parse(stringNumber));
                 SetNextToken(previusToken, token);
 
-                return Tokenizer(NextCharacter(), token);
+                return Tokenizer(nextChar, token);
             }
             else if (currentChar == '+')
             {
@@ -106,6 +106,35 @@ public class Lexer
                 }
 
                 var tokenOperator = new OperatorAdd(previusToken);
+                var nextTokenOperator = Tokenizer(NextCharacter(), tokenOperator);
+                SetNextToken(previusToken, tokenOperator);
+
+                if (nextTokenOperator is TokenOperator)
+                {
+                    throw new Exception("Invalid token");
+                }
+
+                return nextTokenOperator;
+            }
+            else if (currentChar == '-')
+            {
+                _whiteSpaceCounter = 0;
+                if (previusToken is TokenOperator || previusToken is null)
+                {
+                    var tokenSignal = new SignalNegative();
+                    var nextTokenSignal = Tokenizer(NextCharacter(), tokenSignal);
+
+                    if (nextTokenSignal is TokenOperator)
+                    {
+                        throw new Exception("Invalid token");
+                    }
+
+                    SetNextToken(previusToken, tokenSignal);
+
+                    return tokenSignal;
+                }
+
+                var tokenOperator = new OperatorSub(previusToken);
                 var nextTokenOperator = Tokenizer(NextCharacter(), tokenOperator);
                 SetNextToken(previusToken, tokenOperator);
 
