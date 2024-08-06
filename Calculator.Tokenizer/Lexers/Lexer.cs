@@ -7,9 +7,9 @@ using Calculator.Tokenizer.Tokens.Mathematic.Signals;
 namespace Calculator.Tokenizer.Lexers;
 public class Lexer
 {
+    private readonly TokenList _tokenList = new();
     private readonly StreamReader _reader;
     private int _whiteSpaceCounter = 0;
-    private Token? _root;
 
     public Lexer(Stream input)
     {
@@ -58,10 +58,12 @@ public class Lexer
     // - ( 1 + 2 ) + 3: good no
     private Token? Tokenizer(int input, Token? previusToken = null)
     {
+        Token? token = null;
+
         while (input != -1)
         {
             char currentChar = (char)input;
-            if(currentChar == ' ')
+            if (currentChar == ' ')
             {
                 _whiteSpaceCounter++;
                 if (_whiteSpaceCounter > 2)
@@ -77,14 +79,15 @@ public class Lexer
                 stringBuilder.Append(currentChar);
                 var nextChar = NextCharacter();
 
-                while(IsNumber((char)nextChar))
+                while (IsNumber((char)nextChar))
                 {
                     stringBuilder.Append(nextChar);
                 }
 
                 var stringNumber = stringBuilder.ToString();
-                var token = new TokenNumber(decimal.Parse(stringNumber));
-                SetNextToken(previusToken, token);
+                token = new TokenNumber(decimal.Parse(stringNumber));
+
+                _tokenList.Add(token);
 
                 return Tokenizer(nextChar, token);
             }
@@ -93,21 +96,33 @@ public class Lexer
                 _whiteSpaceCounter = 0;
                 if (previusToken is TokenOperator || previusToken is null)
                 {
-                    var tokenSignal = new SignalPositive();
-                    var nextTokenSignal = Tokenizer(NextCharacter(), tokenSignal);
+                    token = new SignalPositive();
+                    _tokenList.Add(token);
+
+                    var nextTokenSignal = Tokenizer(NextCharacter(), token);
+
+                    if (nextTokenSignal is null)
+                    {
+                        throw new Exception("Invalid token");
+                    }
                     if (nextTokenSignal is TokenOperator)
                     {
                         throw new Exception("Invalid token");
                     }
 
-                    SetNextToken(previusToken, tokenSignal);
 
-                    return tokenSignal;
+                    return token;
                 }
 
-                var tokenOperator = new OperatorAdd(previusToken);
-                var nextTokenOperator = Tokenizer(NextCharacter(), tokenOperator);
-                SetNextToken(previusToken, tokenOperator);
+                token = new OperatorAdd(previusToken);
+                _tokenList.Add(token);
+
+                var nextTokenOperator = Tokenizer(NextCharacter(), token);
+
+                if (nextTokenOperator is null)
+                {
+                    throw new Exception("Invalid token");
+                }
 
                 if (nextTokenOperator is TokenOperator)
                 {
@@ -121,23 +136,32 @@ public class Lexer
                 _whiteSpaceCounter = 0;
                 if (previusToken is TokenOperator || previusToken is null)
                 {
-                    var tokenSignal = new SignalNegative();
-                    var nextTokenSignal = Tokenizer(NextCharacter(), tokenSignal);
+                    token = new SignalNegative();
+                    _tokenList.Add(token);
 
+                    var nextTokenSignal = Tokenizer(NextCharacter(), token);
+
+                    if (nextTokenSignal is null)
+                    {
+                        throw new Exception("Invalid token");
+                    }
                     if (nextTokenSignal is TokenOperator)
                     {
                         throw new Exception("Invalid token");
                     }
 
-                    SetNextToken(previusToken, tokenSignal);
-
-                    return tokenSignal;
+                    return token;
                 }
 
-                var tokenOperator = new OperatorSub(previusToken);
-                var nextTokenOperator = Tokenizer(NextCharacter(), tokenOperator);
-                SetNextToken(previusToken, tokenOperator);
+                token = new OperatorSub(previusToken);
+                _tokenList.Add(token);
 
+                var nextTokenOperator = Tokenizer(NextCharacter(), token);
+
+                if (nextTokenOperator is null)
+                {
+                    throw new Exception("Invalid token");
+                }
                 if (nextTokenOperator is TokenOperator)
                 {
                     throw new Exception("Invalid token");
@@ -151,23 +175,12 @@ public class Lexer
             }
         }
 
-        return previusToken;
+        return token;
     }
 
     private int NextCharacter()
     {
         return _reader.Read();
-    }
-
-    private void SetNextToken(Token? previus, Token next)
-    {
-        if (previus == null)
-        {
-            _root = next;
-            return;
-        }
-
-        previus.NextToken = next;
     }
 
     public Token Tokenization()
@@ -178,6 +191,8 @@ public class Lexer
         var root = Tokenizer(character);
         if (root == null) throw new Exception("Error or no data");
 
-        return _root;
+        if (_tokenList.Count == 0) throw new Exception("No token");
+
+        return _tokenList.Head!;
     }
 }
