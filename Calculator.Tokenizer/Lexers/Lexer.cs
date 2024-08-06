@@ -96,7 +96,6 @@ public class Lexer
 
                     SetNextToken(previus, tokenSignal);
 
-                    // NOTE: return next or token?
                     return tokenSignal;
                 }
 
@@ -117,7 +116,7 @@ public class Lexer
             }
         }
 
-        return _root;
+        return previus;
     }
 
     private int NextCharacter()
