@@ -1,13 +1,13 @@
 namespace Calculator.Tokenizer.Tokens;
-public class Token
+public class Token : IToken
 {
-    public virtual Token? NextToken { get; set; }
+    public virtual IToken? NextToken { get; set; }
     public Token()
     {
         NextToken = null;
     }
 
-    public Token(Token? next)
+    public Token(IToken? next)
     {
         NextToken = next;
     }

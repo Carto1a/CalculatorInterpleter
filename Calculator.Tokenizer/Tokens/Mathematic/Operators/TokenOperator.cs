@@ -1,24 +1,17 @@
 namespace Calculator.Tokenizer.Tokens.Mathematic.Operators;
-public class TokenOperator : Token
+public class TokenOperator : IToken
 {
-    public Token Right { get; set; }
-    public Token Left { get; set; }
-
-    public override Token? NextToken
+    public IToken Left { get; set; }
+    public IToken? Right
     {
-        get => Right;
-        set => Right = value;
+        get => NextToken;
+        set => NextToken = value;
     }
 
-    public TokenOperator(Token left)
-    {
-        Left = left;
-    }
+    public IToken? NextToken { get; set; }
 
-    public TokenOperator(Token left, Token right)
-    : base(right)
+    public TokenOperator(IToken left)
     {
         Left = left;
-        Right = right;
     }
 }

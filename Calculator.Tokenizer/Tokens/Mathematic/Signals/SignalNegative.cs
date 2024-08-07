@@ -1,8 +1,9 @@
+using Calculator.Tokenizer.Tokens.Mathematic.Scopes;
+
 namespace Calculator.Tokenizer.Tokens.Mathematic.Signals;
 public class SignalNegative : TokenSignal
 {
     public SignalNegative() { }
-    public SignalNegative(TokenNumber value) : base(value) { }
 
     public override string ToString()
     {

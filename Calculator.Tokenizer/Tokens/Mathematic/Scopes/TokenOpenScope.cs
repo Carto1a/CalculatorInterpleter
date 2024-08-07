@@ -1,19 +1,15 @@
+using Calculator.Tokenizer.Tokens.Mathematic.Signals;
+
 namespace Calculator.Tokenizer.Tokens.Mathematic.Scopes;
-public class TokenOpenScope : TokenScope
+public class TokenOpenScope : TokenScope, ICanHaveSignal
 {
-    public TokenOpenScope(int level)
-    {
-        Level = level;
-        Scope.OpenScope = this;
-    }
+    public TokenOpenScope() { }
 
-    public void Add(Token token)
+    public void Add(IToken token)
     {
+        if (Scope is null)
+            throw new InvalidOperationException("Scope is not set");
+
         Scope.Add(token);
-    }
-
-    public override string ToString()
-    {
-        return "( ";
     }
 }

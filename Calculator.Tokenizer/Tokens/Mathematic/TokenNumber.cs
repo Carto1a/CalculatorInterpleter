@@ -1,5 +1,7 @@
+using Calculator.Tokenizer.Tokens.Mathematic.Signals;
+
 namespace Calculator.Tokenizer.Tokens.Mathematic;
-public class TokenNumber : Token
+public class TokenNumber : Token, ICanHaveSignal
 {
     public decimal Value { get; }
 
@@ -8,14 +10,8 @@ public class TokenNumber : Token
         Value = value;
     }
 
-    public TokenNumber(decimal value, Token? next)
-    : base(next)
-    {
-        Value = value;
-    }
-
     public override string ToString()
     {
-        return $"{Value.ToString()} ";
+        return $"{Value} ";
     }
 }

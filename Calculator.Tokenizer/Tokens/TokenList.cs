@@ -1,10 +1,12 @@
 namespace Calculator.Tokenizer.Tokens;
 public class TokenList
 {
-    public Token? Head { get; set; }
-    public Token? Tail { get; set; }
+    public IToken? Head { get; set; }
+    public IToken? Tail { get; set; }
 
     public int Count { get; private set; }
+
+    public bool IsSyntaxAnalyzed { get; set; } = false;
 
     public TokenList()
     {
@@ -13,7 +15,7 @@ public class TokenList
         Count = 0;
     }
 
-    public void Add(Token token)
+    public void Add(IToken token)
     {
         Count++;
         if (Head == null)
