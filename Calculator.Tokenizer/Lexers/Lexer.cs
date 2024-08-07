@@ -1,4 +1,5 @@
 using System.Text;
+
 using Calculator.Tokenizer.Lexers.Exceptions;
 using Calculator.Tokenizer.Tokens;
 using Calculator.Tokenizer.Tokens.Mathematic;
@@ -9,17 +10,18 @@ using Calculator.Tokenizer.Tokens.Mathematic.Signals;
 namespace Calculator.Tokenizer.Lexers;
 public class Lexer
 {
-    public readonly int MIN_SCOPE_LEVEL = 0;
+    public const int MIN_SCOPE_LEVEL = 0;
 
     private readonly TokenList _tokenList = new();
     private readonly StreamReader _reader;
-    private int _whiteSpaceCounter = 0;
+    private int _whiteSpaceCounter;
     private int _atualScopeLevel;
 
     public Lexer(Stream input)
     {
         _reader = new StreamReader(input);
         _atualScopeLevel = MIN_SCOPE_LEVEL;
+        _whiteSpaceCounter = 0;
     }
 
     private bool IsNumber(char character)
@@ -37,7 +39,7 @@ public class Lexer
 
         while (current != null)
         {
-            buffer.Append(current.ToString());
+            _ = buffer.Append(current.ToString());
             current = current.NextToken;
         }
 
@@ -82,12 +84,12 @@ public class Lexer
             {
                 _whiteSpaceCounter = 0;
                 var stringBuilder = new StringBuilder();
-                stringBuilder.Append(currentChar);
+                _ = stringBuilder.Append(currentChar);
                 var nextChar = NextCharacter();
 
                 while (IsNumber((char)nextChar))
                 {
-                    stringBuilder.Append(nextChar);
+                    _ = stringBuilder.Append(nextChar);
                 }
 
                 var stringNumber = stringBuilder.ToString();
@@ -102,7 +104,7 @@ public class Lexer
             else if (currentChar == '+')
             {
                 _whiteSpaceCounter = 0;
-                if (previusToken is TokenOperator || previusToken is null)
+                if (previusToken is TokenOperator or null)
                 {
                     token = new SignalPositive();
                     _tokenList.Add(token);
@@ -141,7 +143,7 @@ public class Lexer
             else if (currentChar == '-')
             {
                 _whiteSpaceCounter = 0;
-                if (previusToken is TokenOperator || previusToken is null)
+                if (previusToken is TokenOperator or null)
                 {
                     token = new SignalNegative();
                     _tokenList.Add(token);
