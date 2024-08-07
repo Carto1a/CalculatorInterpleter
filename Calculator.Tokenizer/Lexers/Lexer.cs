@@ -1,4 +1,5 @@
 using System.Text;
+using Calculator.Tokenizer.Lexers.Exceptions;
 using Calculator.Tokenizer.Tokens;
 using Calculator.Tokenizer.Tokens.Mathematic;
 using Calculator.Tokenizer.Tokens.Mathematic.Operators;
@@ -72,7 +73,7 @@ public class Lexer
             {
                 _whiteSpaceCounter++;
                 if (_whiteSpaceCounter > 2)
-                    throw new Exception("too many white spaces");
+                    throw new LexerTooManySpacesException();
 
                 input = NextCharacter();
                 continue;
@@ -110,11 +111,11 @@ public class Lexer
 
                     if (nextTokenSignal is null)
                     {
-                        throw new Exception("Invalid token");
+                        throw new LexerSignalTokenException("No token after signal");
                     }
                     if (nextTokenSignal is TokenOperator)
                     {
-                        throw new Exception("Invalid token");
+                        throw new LexerSignalTokenException("Invalid token after signal");
                     }
 
                     return token;
@@ -127,12 +128,12 @@ public class Lexer
 
                 if (nextTokenOperator is null)
                 {
-                    throw new Exception("Invalid token");
+                    throw new LexerOperatorTokenException("No token after operator");
                 }
 
                 if (nextTokenOperator is TokenOperator)
                 {
-                    throw new Exception("Invalid token");
+                    throw new LexerOperatorTokenException("Invalid token after operator");
                 }
 
                 return token;
@@ -149,11 +150,11 @@ public class Lexer
 
                     if (nextTokenSignal is null)
                     {
-                        throw new Exception("Invalid token");
+                        throw new LexerSignalTokenException("No token after signal");
                     }
                     if (nextTokenSignal is TokenOperator)
                     {
-                        throw new Exception("Invalid token");
+                        throw new LexerSignalTokenException("Invalid token after signal");
                     }
 
                     return token;
@@ -166,11 +167,12 @@ public class Lexer
 
                 if (nextTokenOperator is null)
                 {
-                    throw new Exception("Invalid token");
+                    throw new LexerOperatorTokenException("No token after operator");
                 }
+
                 if (nextTokenOperator is TokenOperator)
                 {
-                    throw new Exception("Invalid token");
+                    throw new LexerOperatorTokenException("Invalid token after operator");
                 }
 
                 return token;
@@ -216,7 +218,7 @@ public class Lexer
             /* } */
             else
             {
-                throw new Exception("Invalid token");
+                throw new LexerInvalidTokenException("Character is a invalid token");
             }
         }
 
@@ -231,12 +233,12 @@ public class Lexer
     public Token Tokenization()
     {
         var character = _reader.Read();
-        if (character == -1) throw new Exception("No character to tokenize");
+        if (character == -1) throw new LexerNoDataException();
 
         var root = Tokenizer(character);
-        if (root == null) throw new Exception("Error or no data");
+        if (root == null) throw new LexerEmptyTreeException();
 
-        if (_tokenList.Count == 0) throw new Exception("No token");
+        if (_tokenList.Count == 0) throw new LexerEmptyTreeException();
 
         return _tokenList.Head!;
     }
