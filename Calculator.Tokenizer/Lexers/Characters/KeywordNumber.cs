@@ -5,8 +5,7 @@ using Calculator.Tokenizer.Tokens.Mathematic;
 namespace Calculator.Tokenizer.Lexers.Characters;
 public class KeywordNumber : IKeyword
 {
-    public IToken ToToken(
-        int characterNumber, IToken previusToken, LexerContext context)
+    public IToken ToToken(int characterNumber, IToken? previusToken, LexerContext context)
     {
         var stringBuilder = new StringBuilder();
         var nextChar = characterNumber;

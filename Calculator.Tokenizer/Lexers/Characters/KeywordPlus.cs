@@ -10,8 +10,7 @@ public class KeywordPlus : IKeyword
         throw new NotImplementedException();
     }
 
-    public IToken ToToken(
-        int characterNumber, IToken previusToken, LexerContext context)
+    public IToken ToToken(int characterNumber, IToken? previusToken, LexerContext context)
     {
         if (previusToken is TokenOperator or null)
         {

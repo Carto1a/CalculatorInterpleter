@@ -7,6 +7,9 @@ public class LexerContext
     public static int ASCII_NUMBER_0 = 48;
     public static int ASCII_NUMBER_9 = 57;
 
+    public int Count => _tokenList.Count;
+    public IToken? Head => _tokenList.Head;
+
     private readonly TokenList _tokenList = new();
     private readonly StreamReader _reader;
 
@@ -43,5 +46,10 @@ public class LexerContext
     public bool IsTooManyWhiteSpaces()
     {
         return _whiteSpaceCounter > 2;
+    }
+
+    public void AddToken(IToken token)
+    {
+        _tokenList.Add(token);
     }
 }

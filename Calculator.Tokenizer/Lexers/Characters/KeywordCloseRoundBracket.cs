@@ -9,7 +9,7 @@ public class KeywordCloseRoundBracket : IKeyword
         throw new NotImplementedException();
     }
 
-    public IToken ToToken(int characterNumber, IToken previusToken, LexerContext context)
+    public IToken ToToken(int characterNumber, IToken? previusToken, LexerContext context)
     {
         return new TokenCloseRoundBracketScope();
     }

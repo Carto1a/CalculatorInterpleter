@@ -11,8 +11,7 @@ public class KeywordMinus : IKeyword
         throw new NotImplementedException();
     }
 
-    public IToken ToToken(
-        int character, IToken previusToken, LexerContext context)
+    public IToken ToToken(int character, IToken? previusToken, LexerContext context)
     {
         if (previusToken is TokenOperator or null)
         {

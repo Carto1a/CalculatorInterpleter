@@ -11,6 +11,18 @@ public class Lexer
 
     private static Dictionary<char, IKeyword> _keywords = new()
     {
+        { '0', new KeywordNumber() },
+        { '1', new KeywordNumber() },
+        { '2', new KeywordNumber() },
+        { '3', new KeywordNumber() },
+        { '4', new KeywordNumber() },
+        { '5', new KeywordNumber() },
+        { '6', new KeywordNumber() },
+        { '7', new KeywordNumber() },
+        { '8', new KeywordNumber() },
+        { '9', new KeywordNumber() },
+        { '.', new KeywordNumber() },
+        { ',', new KeywordNumber() },
         { '+', new KeywordPlus() },
         { '-', new KeywordMinus() },
         { '(', new KeywordOpenRoundBracket() },
@@ -20,13 +32,6 @@ public class Lexer
     public Lexer(Stream input)
     {
         _context = new LexerContext(input);
-        _keywords.Add('.', new KeywordNumber());
-        _keywords.Add(',', new KeywordNumber());
-
-        for(int i = LexerContext.ASCII_NUMBER_0; i <= LexerContext.ASCII_NUMBER_9; i++)
-        {
-            _keywords.Add((char)i, new KeywordNumber());
-        }
     }
 
     public string Untokenize(IToken root)
@@ -83,14 +88,19 @@ public class Lexer
                 _context.ResetWhiteSpaceCounter();
             }
 
-
+            IKeyword? keyword = null;
+            if (_keywords.TryGetValue(currentChar, out keyword))
+            {
+                token = keyword.ToToken(currentChar, previusToken, _context);
+                _context.AddToken(token);
+                previusToken = token;
+                input = _context.NextCharacter();
+                continue;
+            }
+            else
             {
                 throw new LexerInvalidTokenException("Character is a invalid token");
             }
-
-            previusToken = token;
-            input = NextCharacter();
-            continue;
         }
 
         return token;
@@ -98,14 +108,14 @@ public class Lexer
 
     public IToken InitializerTokenization()
     {
-        var character = _reader.Read();
+        var character = _context.NextCharacter();
         if (character == -1) throw new LexerNoDataException();
 
         var root = Tokenizer(character);
         if (root == null) throw new LexerEmptyTreeException();
 
-        if (_tokenList.Count == 0) throw new LexerEmptyTreeException();
+        if (_context.Count == 0) throw new LexerEmptyTreeException();
 
-        return _tokenList.Head!;
+        return _context.Head!;
     }
 }
